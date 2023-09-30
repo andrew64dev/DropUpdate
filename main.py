@@ -354,11 +354,11 @@ class PanelConfiguration(discord.ui.View):
 
     @discord.ui.button(label="Add a option", custom_id="add-option", style=discord.ButtonStyle.green, emoji="<:up:1156316069024243863>", disabled=True)
     async def add_option_callback(self, button, i: discord.Interaction):
-        await i.response.send_message('FAIL!')
+        await i.response.send_message('FAIL!', ephemeral=True)
     
     @discord.ui.button(label="Send panel", custom_id="send-panel", style=discord.ButtonStyle.grey, emoji="<:sendmsg:1156631661610541147>", disabled=True)
     async def send_panel_callback(self, button, i: discord.Interaction):
-        await i.response.send_message('FAIL!')
+        await i.response.send_message('FAIL!', ephemeral=True)
 
 @bot.slash_command(description='Create a new panel.')
 async def create(ctx: discord.ApplicationContext):
