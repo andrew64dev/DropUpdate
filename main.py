@@ -11,7 +11,7 @@
 import discord, json, random, requests, asyncio
 
 bot = discord.Bot()
-config = json.load(open('config.json'))
+config = json.load(open('config.json', 'r'))
 
 user_agents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
@@ -144,7 +144,7 @@ class AddOptionModal(discord.ui.Modal):
             except: pass
 
             if self.other:
-                return await i.response.send_message('Options are MAX!', ephemeral=True)
+                return await i.response.send_message('Options are MAX!')
 
             return
 
@@ -158,13 +158,16 @@ class AddOptionModal(discord.ui.Modal):
         except: pass
 
         if self.other:
-            for x in i.guild.text_channels:
-                try:
-                    msg = await x.fetch_message(r[str(i.guild.id)]['panels'][str(self.panelID)]['msgID'])
-                    break
-                except: pass
+          ch = await bot.fetch_channel(int(r[str(i.guild.id)]['panels'][str(self.panelID)]['channelID']))
+
+          async for msg in ch.history(limit=None):
+            if msg.author.id == 1155949276791316511 or msg.author.id == "1155949276791316511":
+                  try:
+                      if msg.id == int(r[str(i.guild.id)]['panels'][str(self.panelID)]['msgID']):
+                        await msg.edit(view=OptionsHandler(guildID=i.guild.id, panelID=self.panelID))
+                  except: pass
             
-            await msg.edit(view=OptionsHandler(guildID=i.guild.id, panelID=self.panelID))
+            
 
 
 guildID2 = 1
@@ -298,7 +301,9 @@ class PanelConfiguration2(discord.ui.View):
             msg = await ch.send(embed=embed, view=OptionsHandler(guildID=i.guild.id, panelID=self.panelID))   
             
             r[str(i.guild.id)]['panels'][str(self.panelID)]['msgID'] = str(msg.id)
+            r[str(i.guild.id)]['panels'][str(self.panelID)]['channelID'] = str(ch.id)
 
+          
             with open('database.json', 'w') as f:
                 json.dump(r, f, indent=5)
 
@@ -423,18 +428,20 @@ async def remove(ctx: discord.ApplicationContext, panelid: discord.Option(int, "
             if str(x['optionName']) == str(option):
                 r[str(i.guild.id)]['panels'][str(panelid)]['contents'].remove(x)
                 break
-                
+        r[str(i.guild.id)]['panels'][str(panelid)]['insideContents'][:-1]
+      
         with open('database.json', 'w') as f:
             json.dump(r, f, indent=5)
 
-        for x in i.guild.text_channels:
-            try:
-                msg = await x.fetch_message(r[str(i.guild.id)]['panels'][str(panelid)]['msgID'])
-                break
-            except: pass
-            
-        await msg.edit(view=OptionsHandler(guildID=i.guild.id, panelID=panelid))
-
+        ch = await bot.fetch_channel(int(r[str(i.guild.id)]['panels'][str(panelid)]['channelID']))
+      
+        async for msg in ch.history(limit=None):
+            if msg.author.id == 1155949276791316511 or msg.author.id == "1155949276791316511":
+                  try:
+                      if msg.id == int(r[str(i.guild.id)]['panels'][str(panelid)]['msgID']):
+                        await msg.edit(view=OptionsHandler(guildID=i.guild.id, panelID=panelid))
+                  except: pass
+      
         await i.response.edit_message(embed=embed, view=None)
     
     options = [ discord.SelectOption( label=x['optionName'], description=x['optionDesc'] ) for x in r[str(ctx.guild.id)]['panels'][str(panelid)]['contents'] ] # alr MAYBE this time i made it difficult :) sorry i like one line stuff
@@ -469,6 +476,7 @@ async def on_ready():
     bot.add_view(PanelConfiguration2(panelID=None))
     bot.add_view(OptionsHandler(guildID=1, panelID=1))
     print('OK')
+    await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
     while True:
       await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
       await asyncio.sleep(5)
