@@ -11,7 +11,7 @@
 import discord, json, random, requests, asyncio
 
 bot = discord.Bot()
-config = json.load(open('config.json', 'r'))
+config = json.load(open('config.json'))
 
 user_agents = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
@@ -257,7 +257,7 @@ class PanelConfiguration2(discord.ui.View):
     @discord.ui.button(label="Create message", custom_id="create-message", style=discord.ButtonStyle.blurple, emoji="<:eyes:1156310608204005506>", disabled=True)
     async def create_message_callback(self, button, i: discord.Interaction):
 
-        await i.response.send_message('FAIL!')
+        await i.response.send_message('FAIL!', ephemeral=True)
 
     @discord.ui.button(label="Add a option", custom_id="add-option", style=discord.ButtonStyle.green, emoji="<:up:1156316069024243863>")
     async def add_option_callback(self, button, i: discord.Interaction):
@@ -468,7 +468,10 @@ async def on_ready():
     bot.add_view(PanelConfiguration())
     bot.add_view(PanelConfiguration2(panelID=None))
     bot.add_view(OptionsHandler(guildID=1, panelID=1))
-    await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
     print('OK')
+    while True:
+      await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
+      await asyncio.sleep(5)
+      await bot.change_presence(activity=discord.Game(name='Keeping track of your panels!'))
 
 bot.run(config['token'])
