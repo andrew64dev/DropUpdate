@@ -249,11 +249,6 @@ class OptionsHandler(discord.ui.View):
         except TypeError as e:
             print('TypeError: ', e)
 
-
-# Rest of your code...
-
-
-
 class PanelConfiguration2(discord.ui.View):
     def __init__(self, panelID):
         super().__init__(timeout=None)
