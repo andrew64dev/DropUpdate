@@ -524,15 +524,15 @@ async def editpanel(ctx: discord.ApplicationContext, panelid: discord.Option(int
 
 @bot.slash_command(description="Would You Rather?")
 async def wouldurather(ctx: discord.ApplicationContext):
-    gameConfigREQ = requests.get(url='https://wouldurather.io/api/gameConfig')
-
+    headers = {'User-Agent': random.choice(user_agents)}
+    gameConfigREQ = requests.get(url='https://wouldurather.io/api/gameConfig', headers=headers)
     gameConfig = gameConfigREQ.json()
     minRange = gameConfig['min_range']
     maxRange = gameConfig['max_range']
 
     questionID = random.randint(int(minRange), int(maxRange))
 
-    questionREQ = requests.get(url='https://wouldurather.io/api/question?id=' + str(questionID))
+    questionREQ = requests.get(url='https://wouldurather.io/api/question?id=' + str(questionID), headers=headers)
     question = questionREQ.json()
     option1 = question['option1']
     option2 = question['option2']
@@ -544,11 +544,11 @@ async def wouldurather(ctx: discord.ApplicationContext):
     embed.color = discord.Color.brand_red()
     embed.add_field(
         name = "Option 1",
-        value = f"{option1}\n{opt1votes}"
+        value = f"{option1}"
     )
     embed.add_field(
         name = "Option 2",
-        value = f"{option2}\n{opt2votes}"
+        value = f"{option2}"
     )
 
     await ctx.respond(embed=embed)
