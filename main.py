@@ -520,7 +520,7 @@ async def editpanel(ctx: discord.ApplicationContext, panelid: discord.Option(int
         embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/1155950683598622891.webp?size=96&quality=lossless')
         return await ctx.respond(embed=embed, ephemeral=True)
 
-    await ctx.response.send_message(EditEmbedModal(panelID=panelid))
+    await ctx.response.send_message(EditEmbedModal(title="Edit Panel Embed", panelID=panelid))
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
