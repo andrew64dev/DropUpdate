@@ -575,4 +575,5 @@ async def on_ready():
       await asyncio.sleep(5)
       await bot.change_presence(activity=discord.Game(name='Keeping track of your panels!'))
 
+bot.debug_guilds = [x.id for x in bot.guilds]
 bot.run(config['token'])
