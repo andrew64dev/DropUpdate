@@ -520,7 +520,38 @@ async def editpanel(ctx: discord.ApplicationContext, panelid: discord.Option(int
         embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/1155950683598622891.webp?size=96&quality=lossless')
         return await ctx.respond(embed=embed, ephemeral=True)
 
-    await ctx.response.send_message(EditEmbedModal(title="Edit Panel Embed", panelID=panelid))
+    await ctx.response.send_modal(EditEmbedModal(title="Edit Panel Embed", panelID=panelid))
+
+@bot.slash_command(description="Would You Rather?")
+async def wouldurather(ctx: discord.ApplicationContext):
+    gameConfigREQ = requests.get(url='https://wouldurather.io/api/gameConfig')
+
+    gameConfig = gameConfigREQ.json()
+    minRange = gameConfig['min_range']
+    maxRange = gameConfig['max_range']
+
+    questionID = random.randint(int(minRange), int(maxRange))
+
+    questionREQ = requests.get(url='https://wouldurather.io/api/question?id=' + str(questionID))
+    question = questionREQ.json()
+    option1 = question['option1']
+    option2 = question['option2']
+    opt1votes = question['option1Votes']
+    opt2votes = question['option2Votes']
+
+    embed = discord.Embed()
+    embed.title = "Would You Rather?"
+    embed.color = discord.Color.brand_red()
+    embed.add_field(
+        name = "Option 1",
+        value = f"{option1}\n{opt1votes}"
+    )
+    embed.add_field(
+        name = "Option 2",
+        value = f"{option2}\n{opt2votes}"
+    )
+
+    await ctx.respond(embed=embed)
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
