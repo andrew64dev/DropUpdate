@@ -510,7 +510,8 @@ async def remove(ctx: discord.ApplicationContext, panelid: discord.Option(int, "
     await ctx.respond(view=view, ephemeral=True)
 
 @bot.slash_command(description="Edit a Panel Embed")
-
+async def editpanel(ctx: discord.ApplicationContext, panelid: discord.Option(int, 'The Panel ID.', required=True)):
+    await ctx.response.send_message(EditEmbedModal(panelID=panelid))
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
