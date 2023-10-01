@@ -562,6 +562,14 @@ async def on_guild_join(guild: discord.Guild):
 
     with open('database.json', 'w') as f:
         json.dump(r, f, indent=5)
+    
+    with open('config.json', 'r') as f:
+        a = json.load(f)
+    
+    a['servers'].append(str(guild.id))
+
+    with open('config.json', 'w') as f:
+        json.dump(a, f)
 
 @bot.event
 async def on_ready():
