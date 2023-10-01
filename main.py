@@ -10,7 +10,7 @@
 
 import discord, json, random, requests, asyncio
 
-bot = discord.Bot()
+bot = discord.Bot(intents=discord.Intents.all())
 config = json.load(open('config.json', 'r'))
 
 user_agents = [
@@ -562,26 +562,13 @@ async def on_guild_join(guild: discord.Guild):
 
     with open('database.json', 'w') as f:
         json.dump(r, f, indent=5)
-    
-    with open('config.json', 'r') as f:
-        a = json.load(f)
-    
-    a['servers'].append(str(guild.id))
-
-    with open('config.json', 'w') as f:
-        json.dump(a, f)
 
 @bot.event
 async def on_ready():
     bot.add_view(PanelConfiguration())
     bot.add_view(PanelConfiguration2(panelID=None))
     bot.add_view(OptionsHandler(guildID=1, panelID=1))
-    print('OK')
     await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
-    while True:
-      await bot.change_presence(activity=discord.Game(name='Updating your messages!'))
-      await asyncio.sleep(5)
-      await bot.change_presence(activity=discord.Game(name='Keeping track of your panels!'))
+    print('OK')
 
-bot.debug_guilds = [int(x) for x in config['servers']]
 bot.run(config['token'])
