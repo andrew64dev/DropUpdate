@@ -536,19 +536,19 @@ async def wouldurather(ctx: discord.ApplicationContext):
     question = questionREQ.json()
     option1 = question['option1']
     option2 = question['option2']
-    opt1votes = question['option1Votes']
-    opt2votes = question['option2Votes']
+    opt1votes = round((question["option1Votes"]/(question["option1Votes"]+question["option2Votes"]))*100)
+    opt2votes = round((question["option2Votes"]/(question["option1Votes"]+question["option2Votes"]))*100)
 
     embed = discord.Embed()
     embed.title = "Would You Rather?"
     embed.color = discord.Color.brand_red()
     embed.add_field(
         name = "Option 1",
-        value = f"{option1}"
+        value = f"{option1}\n{opt1votes}%"
     )
     embed.add_field(
         name = "Option 2",
-        value = f"{option2}"
+        value = f"{option2}\n{opt2votes}%"
     )
 
     await ctx.respond(embed=embed)
@@ -575,5 +575,5 @@ async def on_ready():
       await asyncio.sleep(5)
       await bot.change_presence(activity=discord.Game(name='Keeping track of your panels!'))
 
-bot.debug_guilds = [x.id for x in bot.guilds]
+bot.debug_guilds = [int(x) for x in config['servers']]
 bot.run(config['token'])
