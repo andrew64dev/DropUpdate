@@ -544,14 +544,19 @@ async def wouldurather(ctx: discord.ApplicationContext):
     embed.color = discord.Color.brand_red()
     embed.add_field(
         name = "Option 1",
-        value = f"{option1}\n{opt1votes}%"
+        value = f"{option1}\n{opt1votes}%\n"
     )
     embed.add_field(
         name = "Option 2",
-        value = f"{option2}\n{opt2votes}%"
+        value = f"{option2}\n{opt2votes}%\n"
     )
 
-    await ctx.respond(embed=embed)
+    msg = await ctx.respond(embed=embed)
+
+    msgObj = await msg.original_response()
+
+    await msgObj.add_reaction('1️⃣')
+    await msgObj.add_reaction('2️⃣')
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):
@@ -562,6 +567,55 @@ async def on_guild_join(guild: discord.Guild):
 
     with open('database.json', 'w') as f:
         json.dump(r, f, indent=5)
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    channel = bot.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    
+    if not message.embeds:
+        return
+
+    if message.embeds[0].title.lower() != "would you rather?".lower():
+        return
+
+    user = await bot.fetch_user(payload.user_id)
+
+    if user.bot:
+        return
+
+    if payload.emoji.name == "1️⃣":
+        message.embeds[0].fields[0].value += f"\n**{user.name}**"
+
+    if payload.emoji.name == "2️⃣":
+        message.embeds[0].fields[1].value += f"\n**{user.name}**"
+    
+    await message.edit(embed=message.embeds[0])
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    channel = bot.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    
+    if not message.embeds:
+        return
+
+    if message.embeds[0].title.lower() != "would you rather?".lower():
+        return
+
+    user = await bot.fetch_user(payload.user_id)
+
+    if user.bot:
+        return
+
+    if payload.emoji.name == "1️⃣":
+        message.embeds[0].fields[0].value = message.embeds[0].fields[0].value.replace(f"\n**{user.name}**", "")
+
+    if payload.emoji.name == "2️⃣":
+        message.embeds[0].fields[1].value = message.embeds[0].fields[1].value.replace(f"\n**{user.name}**", "")
+    
+    await message.edit(embed=message.embeds[0])
+
 
 @bot.event
 async def on_ready():
