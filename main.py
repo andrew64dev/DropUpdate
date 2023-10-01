@@ -511,6 +511,15 @@ async def remove(ctx: discord.ApplicationContext, panelid: discord.Option(int, "
 
 @bot.slash_command(description="Edit a Panel Embed")
 async def editpanel(ctx: discord.ApplicationContext, panelid: discord.Option(int, 'The Panel ID.', required=True)):
+
+    if not ctx.author.guild_permissions.manage_guild:
+        embed = discord.Embed()
+        embed.title = "Missing Permissions"
+        embed.description = "You are missing the Manage Server permission, so you cant create a new panel."
+        embed.color = discord.Color.red()
+        embed.set_thumbnail(url='https://cdn.discordapp.com/emojis/1155950683598622891.webp?size=96&quality=lossless')
+        return await ctx.respond(embed=embed, ephemeral=True)
+
     await ctx.response.send_message(EditEmbedModal(panelID=panelid))
 
 @bot.event
