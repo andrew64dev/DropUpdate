@@ -23,6 +23,55 @@ user_agents = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15'
 ] # Why this? It is for the embed image check. If i spam verify that a image exist, i may get blocked, but with different user agents, its more difficult.
 
+class EditEmbedModal(discord.ui.Modal):
+    def __init__(self, panelID, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.panelID = str(panelID)
+
+        self.add_item(discord.ui.InputText(label="Embed Title"))
+        self.add_item(discord.ui.InputText(label="Embed Description", style=discord.InputTextStyle.long))
+        self.add_item(discord.ui.InputText(label="Embed Thumbnail URL", style=discord.InputTextStyle.long, placeholder="Please insert a direct URL.", required=False))
+
+    async def callback(self, i: discord.Interaction):
+
+        with open('database.json', 'r') as f:
+            r = json.load(f)
+
+        ch = await bot.fetch_channel(int(r[str(i.guild.id)]['panels'][str(self.panelID)]['channelID']))
+        
+        imgURL = None
+
+        if not self.children[2].value == None:
+            try:
+                headers = {'User-Agent': random.choice(user_agents)}
+                req = requests.get(url=self.children[2].value, headers=headers)
+
+                print(req.status_code)
+
+                if not req.status_code in (200, 201, 202):
+                    pass
+                else:
+                    imgURL = self.children[2].value
+            except requests.exceptions.MissingSchema:
+                imgURL = None
+
+        r[str(i.guild.id)]['panels'][self.panelID] = { 'embed': { 'title': self.children[0].value, 'desc': self.children[1].value, 'imgURL': imgURL } }
+
+        embed = discord.Embed()
+        embed.title = r[str(i.guild.id)]['panels'][str(self.panelID)]['embed']['title']
+        embed.description = r[str(i.guild.id)]['panels'][str(self.panelID)]['embed']['desc']
+        embed.color = discord.Color.random()
+        embed.set_footer(text='PanelID: ' + str(self.panelID))
+        if not r[str(i.guild.id)]['panels'][str(self.panelID)]['embed']['imgURL'] == None:
+            embed.set_thumbnail(url=r[str(i.guild.id)]['panels'][str(self.panelID)]['embed']['imgURL'])
+
+        async for msg in ch.history(limit=None):
+            if msg.author.id == 1155949276791316511 or msg.author.id == "1155949276791316511":
+                try:
+                    if msg.id == int(r[str(i.guild.id)]['panels'][str(self.panelID)]['msgID']):
+                        await msg.edit(embed=embed)
+                except: pass
+
 class ConfigModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -459,6 +508,9 @@ async def remove(ctx: discord.ApplicationContext, panelid: discord.Option(int, "
     view.add_item(select)
 
     await ctx.respond(view=view, ephemeral=True)
+
+@bot.slash_command(description="Edit a Panel Embed")
+
 
 @bot.event
 async def on_guild_join(guild: discord.Guild):

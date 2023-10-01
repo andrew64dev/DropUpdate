@@ -5,18 +5,18 @@
                     "panelID": "1",
                     "contents": [
                          {
-                              "title": "xzxz<",
-                              "desc": "xzxz<",
+                              "title": "example",
+                              "desc": "example<",
                               "imgURL": null,
-                              "optionName": "xz<",
-                              "optionDesc": "dssda"
+                              "optionName": "example",
+                              "optionDesc": "example"
                          }
                     ],
                     "inserted": 1,
                     "insideContents": "x",
                     "embed": {
-                         "title": "ad",
-                         "desc": "sdsa",
+                         "title": "example",
+                         "desc": "example",
                          "imgURL": null
                     }
                }
