@@ -254,7 +254,7 @@ class OptionsHandler(discord.ui.View):
                 embed = discord.Embed()
                 embed.title = result['title']
                 embed.description = result['desc']
-                if not result['imgURL'] == None: embed.set_thumbnail(url=result['imgURL'])
+                if not result['imgURL'] == None: embed.set_image(url=result['imgURL'])
                 embed.color = discord.Color.random()
                 embed.set_footer(text='DropUpdate - Panel')
 
